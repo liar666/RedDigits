@@ -15,7 +15,8 @@ source("preprocessing.R")
 
 ### TODO: Add images that have nothing to do with numbers
 
-#INDIR  <- "~/RedDigits/images/numbers/"
+##INDIR  <- "~/RedDigits/images/numbers_orig/"
+##INDIR  <- "~/RedDigits/images/numbers_cleaned/"
 INDIR  <- "~/RedDigits/images/preprocessed/"
 OUTDIR <- "~/RedDigits/model/"
 
@@ -56,13 +57,13 @@ for(imgFile in files) {
 
                             newFile <- p(OUTDIR, number,
                                          "_t", tilt,
-                                         "_r",angle,
-                                         "_t",x,"_",y,
-                                         "_b",sigma,
-                                         "_s",ratio,".png")
+                                         "_r", angle,
+                                         "_t", x,"_", y,
+                                         "_b", sigma,
+                                         "_s", ratio, ".png")
 
-                            print(paste('Writing file: ', newFile))
-                            writeImage(resized, newFile)
+                            ###print(paste('Writing file: ', newFile))
+                            ###writeImage(resized, newFile)
 
                             print(paste('Treating file: ', newFile))
                             attributes <- preprocessImage(resized)
