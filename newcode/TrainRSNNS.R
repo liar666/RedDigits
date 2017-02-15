@@ -1,10 +1,12 @@
 library("RSNNS")
 
+source("TrainSet.R");  # Already load Utils.R
+
 ################################### Load dataset
 
-trainSet <- list() # TODO: check
-trainSet$data    <- read.csv2(file="trainSetData.csv", sep=",");    # TODO: check
-trainSet$classes <- read.csv2(file="trainSetClasses.csv", sep=","); # TODO: check
+trainSet <- loadTrainSetFromCSV("../trainsets/trainSet");
+trainSetPlusClass <- mergeDataAndClasses(trainSet);
+
 #######################################
 
 fitMLP1 <- mlp(x=X, y=Y,
