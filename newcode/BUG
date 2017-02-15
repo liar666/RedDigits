@@ -1,0 +1,4 @@
+[1] "Treating file:  ~/Perso/RedDigits//images/trainset/1_t-0.4_r0_t-1.4_-5.4_b1.6_s1.png"
+Error in filter2(x, filter = makeBrush(size = radius, shape = "Gaussian",  :
+  dimensions of 'x' must be bigger than 'filter'
+Calls: main -> generateTrainSet -> gblur -> filter2

@@ -39,4 +39,3 @@ save(fitDN1, file="MLP_DN.rda");
 load("MLP_DN.rda");
 
 preds <- nn.predict(fitDN1,trainSet$data)
-

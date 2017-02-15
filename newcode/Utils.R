@@ -2,27 +2,49 @@
 ### DONE: add loop to generate bigger trainset
 ### DONE 2a: remove useless files in same dir
 ### DONE 2b: split this one in Utils / genTrainSet / Train / Use
-### TODO 3: use original images + norme L2
 ### TODO: verify places for images/trainset/models
+### TODO 3: use original images + norme L2
 
-library("EBImage")
-
-TRAIN_WIDTH   <- 10;
-TRAIN_HEIGHT  <- 14;
-SIZE_THIRD    <- TRAIN_WIDTH*TRAIN_HEIGHT/3;
-OUTDIR_MODELS <- "~/RedDigits/models/";
-OUTDIR_IMAGES <- "~/RedDigits/images/trainset/";
-
-CLASSES <- as.factor(c(0:9,"E","H"));
-
+### Set seed for reproducible experiments
 set.seed (2016)
 
-### blur, etc must be applied before thresholding!
 
+### Shorter name for simple String concatenation
 p<-function(...) {
     return(paste(...,sep=""))
 }
 
+
+library("EBImage")
+
+### Main dir (changes from machine to machine)
+WORKDIR <- "~/Perso/RedDigits/"
+
+### Directories where to store outputs
+INDIR_IMAGES    <- p(WORKDIR,"/images/preprocessed/");
+##INDIR_IMAGES    <- p(WORKDIR,"/images/numbers_orig/");
+##INDIR_IMAGES    <- p(WORKDIR,"/images/numbers_cleaned/");
+OUTDIR_IMAGES   <- p(WORKDIR,"/images/trainset/");
+OUTDIR_TRAINSET <- p(WORKDIR,"/trainset/");
+OUTDIR_MODELS   <- p(WORKDIR,"/models/");
+
+### Width and Height of the (reduced) images on which learning will occur
+TRAIN_WIDTH   <- 10;
+TRAIN_HEIGHT  <- 14;
+
+### Third of the size/area of the image, to be used as rule of thumb for hidden layer size
+SIZE_THIRD    <- TRAIN_WIDTH*TRAIN_HEIGHT/3;
+
+### The names (factors) of the classes to be detected: numbers 0->9+E+H
+CLASSES <- as.factor(c(0:9,"E","H"));
+
+### Removes the extension from a filename
 removeExt <- function(filename) {
-    gsub("(.*)[.].*", "\\1", filename, perl=T)
+    return(gsub("(.*)[.].*", "\\1", filename, perl=T));
+}
+
+### Generates the full expression as a formula from the variable name (work around for a bug in NeuralNet lib)
+generateFormula <- function(leftVars, rightVars) {
+    formula <- as.formula(paste(paste(leftVars, collapse = "+"), "~", paste(rightVars, collapse="+")));
+    return(formula);
 }

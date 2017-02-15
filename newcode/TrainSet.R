@@ -1,3 +1,5 @@
+source("Utils.R");
+
 ## Store image in TrainSet
 addToTrainSet <- function(trainSet, img, trueClass) {
     ## Rescale to very small image
@@ -15,7 +17,7 @@ generateTrainSet <- function() {
     trainSet <- list(data=data.frame(), classes=data.frame())
     for (cl in CLASSES) {
         ## Read/Load original image
-        origImg <- readImage(p("../images/preprocessed/",cl,".png"));
+        origImg <- readImage(p(INDIR_IMAGES,cl,".png"));
         imgSize <- dim(origImg);
 
         for(tilt in seq(from=-.4,to=.4,by=.2)) {
@@ -50,6 +52,7 @@ generateTrainSet <- function() {
 
                                 print(paste("Treating file: ", newFile));
                                 trainSet <- addToTrainSet(trainSet, resized, cl);
+                                print(paste("New trainSet size: ", object.size(trainSet)));
                             } # size
                         } # blur
                     } # translate y
@@ -62,11 +65,12 @@ generateTrainSet <- function() {
 }
 
 
-## toBool <- function(img) {
-##     return(img>.5)
-## }
+## NOT used: applies a threshold to obtain a boolean image
+toBooleanImage <- function(img) {
+     return(img>.5)
+}
 
-
+# Displays an image, for debugging purposes
 showImg <- function(trainSet, row) {
     flatImg <- trainSet$data[row,];
     img <- matrix(flatImg, nrow=TRAIN_WIDTH);
@@ -75,11 +79,52 @@ showImg <- function(trainSet, row) {
 }
 
 
-trainSet <- generateTrainSet();
-write.csv2(x=trainSet$data, "trainSetData.csv", sep=",");       # TODO: check
-write.csv2(x=trainSet$classes, "trainSetClasses.csv", sep=","); # TODO: check
+# saves "trainSet" to Data+Classes files starting with "prefix"
+saveTrainSetToCSV <- function(trainSet, prefix) {
+    write.csv2(x=trainSet$data, p(prefix,"Data.csv"), sep=",");       # TODO: check
+    write.csv2(x=trainSet$classes, p(prefix,"Classes.csv"), sep=","); # TODO: check
+}
 
-### Reload with:
-trainSet <- list() # TODO: check
-trainSet$data    <- read.csv2(file="trainSetData.csv", sep=",");    # TODO: check
-trainSet$classes <- read.csv2(file="trainSetClasses.csv", sep=","); # TODO: check
+# reloads "trainSet" from Data+Classes files starting with "prefix"
+loadTrainSetFromCSV <- function(prefix) {
+    trainSet <- list(); # TODO: check
+    trainSet$data    <- read.csv2(file=p(prefix,"Data.csv"), sep=",");    # TODO: check
+    trainSet$classes <- read.csv2(file=p(prefix,"Classes.csv"), sep=","); # TODO: check
+    return(trainSet);
+}
+
+## Re-arrange trainSet by concatenating Data+Classes, particularly for NeuralNet lib
+mergeDataAndClasses <- function(trainSet) {
+    trainSetPlusClass <- cbind(trainSet$data, trainSet$classes);
+    inames <- paste("i", 1:TRAIN_WIDTH*TRAIN_HEIGHT, sep="");
+    cnames <- paste("c", CLASSES, sep="");
+    colnames(trainSetPlusClass) <- c(inames,cnames);
+    return(trainSetPlusClass);
+}
+
+################################## Re-arrange and check results
+
+## Returns a vector of all 0s, but at the position of the max, which is set to 1.
+binarizeCol <- function(row) {
+    a<-rep(0,length(row));
+    a[which.max(row)]<-1;
+    return(a);
+}
+## Returns a data.frame with 1 where the value was the max of the row, 0 elsewhere in the row
+binarizePreds <- function(preds) {
+    return(apply(X=preds, MARGIN=1, FUN=binarizeCol))
+}
+
+## Transforms a dataframe of probabilities for each class of each example/row into a column vector with the most probable class for each example/row
+classesProbabilitesToClassNumber <- function(preds) {
+    return(CLASSES[max.col(preds)]);
+}
+
+## Main method. Call this to check methods in this file & generate to trainsSet CSV files
+main <- function() {
+    filename <- p(OUTDIR_TRAINSET,"trainSet");
+    trainSet <- generateTrainSet();
+    saveTrainSetToCSV(trainSet, filename);
+    trainSet2 <- loadTrainSetFromCSV(filename);
+    trainSetPlusClass <- mergeDataAndClasses(trainSet); ## TODO: check
+}

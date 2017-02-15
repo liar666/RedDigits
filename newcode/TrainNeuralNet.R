@@ -1,45 +1,32 @@
-library("neuralnet")
+library("neuralnet");
+
+source("TrainSet.R");  # Already load Utils.R
 
 ################################### Load dataset
 
-trainSet <- list() # TODO: check
-trainSet$data    <- read.csv2(file="trainSetData.csv", sep=",");    # TODO: check
-trainSet$classes <- read.csv2(file="trainSetClasses.csv", sep=","); # TODO: check
+trainSet <- loadTrainSetFromCSV("../trainsets/trainSet");
+trainSetPlusClass <- mergeDataAndClasses(trainSet);
 
-################################## Re-arrange trainSet
+# TODO: use these vectors below, not trainSetPlusClass
+idx <- sample.int(nrow(trainSetPlusClass), round(.9*nrow(trainSetPlusClass)), replace=FALSE);
+train <- trainSetPlusClass[idx,];
+test  <- trainSetPlusClass[-idx,];
 
-mergeDataAndClasses <- function(trainSet) {
-    trainSetPlusClass <- cbind(trainSet$data, trainSet$classes);
-    inames <- paste("i", 1:TRAIN_WIDTH*TRAIN_HEIGHT, sep="");
-    cnames <- paste("c", CLASSES, sep="");
-    colnames(trainSetPlusClass) <- c(inames,cnames);
-    return(trainSetPlusClass);
-}
-trainSetPlusClass <- mergeDataAndClasses(trainSet); ## TODO: check
+################################## Compute a few models
 
-##################################
+formula <- generateFormula(cnames, inames);
 
-formula <- as.formula(paste(paste(cnames, collapse = "+"), "~", paste(inames, collapse="+")))
-fitNN1 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD), threshold=0.01) # Works?
-fitNN2 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD), linear.output=T, threshold=0.01)
-fitNN3 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD*2, SIZE_THIRD, SIZE_THIRD*2), threshold=0.01)
+## Worked for simple digits in B&W
+fitNN1 <- neuralnet(formula, data=train, hidden=c(SIZE_THIRD), threshold=0.01);
+##fitNN2 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD), linear.output=T, threshold=0.01)
+##fitNN3 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD*2, SIZE_THIRD, SIZE_THIRD*2), threshold=0.01)
 
-preds <- compute(fitNN1, trainSet$data)
+save(fitNN1, file=p(OUTDIR_MODELS, "MLP_NN.rda"));
+fitNN12 <- load(p(OUTDIR_MODELS, "MLP_NN.rda"));
 
-save(fitNN1, file="MLP_NN.rda");
-load("MLP_NN.rda");
+predsTrain <- compute(fitNN1, train); ### BOF: testing on learning data :{
+predsTest  <- compute(fitNN1, test);
 
-################################## Re-arrange and check results
-
-binarizeCol <- function(row) {
-    a<-rep(0,length(row));
-    a[which.max(row)]<-1;
-    return(a);
-}
-binarizePreds <- function(preds) {
-    return(apply(X=preds, MARGIN=1, FUN=binarizeCol))
-}
-toClass <- function(preds) {
-    return(CLASSES[max.col(preds)]);
-}
-
+out    <- classesProbabilitesToClassNumber(predsTest);
+wanted <- classesProbabilitesToClassNumber(test$Classes);
+table(out, wanted);
