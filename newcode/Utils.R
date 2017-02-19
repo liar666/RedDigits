@@ -25,7 +25,7 @@ INDIR_IMAGES    <- p(WORKDIR,"/images/preprocessed/");
 ##INDIR_IMAGES    <- p(WORKDIR,"/images/numbers_orig/");
 ##INDIR_IMAGES    <- p(WORKDIR,"/images/numbers_cleaned/");
 OUTDIR_IMAGES   <- p(WORKDIR,"/images/trainset/");
-OUTDIR_TRAINSET <- p(WORKDIR,"/trainset/");
+OUTDIR_TRAINSET <- p(WORKDIR,"/trainsets/");
 OUTDIR_MODELS   <- p(WORKDIR,"/models/");
 
 ### Width and Height of the (reduced) images on which learning will occur
