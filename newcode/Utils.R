@@ -14,6 +14,18 @@ p<-function(...) {
     return(paste(...,sep=""))
 }
 
+### Transforms a prefix + value into a colname by concatenating them as string with no sep
+toColName <- function(prefix, value) {
+    return(p(prefix, value));
+}
+### Uses toColName to generate a colname from a class factor
+class2col <- function(trueClass) {
+    return(toColName("c",trueClass));
+}
+### Uses toColName to generate a colname from a pixel number
+pixel2col <- function(pixelNb) {
+    return(toColName("i", pixelNb));
+}
 
 library("EBImage")
 
@@ -37,6 +49,11 @@ SIZE_THIRD    <- TRAIN_WIDTH*TRAIN_HEIGHT/3;
 
 ### The names (factors) of the classes to be detected: numbers 0->9+E+H
 CLASSES <- as.factor(c(0:9,"E","H"));
+
+# Columns names
+COL_IMG_NAMES   <- pixel2col(1:(TRAIN_WIDTH*TRAIN_HEIGHT));
+COL_CLASS_NAMES <- class2col(CLASSES);
+
 
 ### Removes the extension from a filename
 removeExt <- function(filename) {

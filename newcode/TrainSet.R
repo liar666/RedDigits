@@ -1,7 +1,7 @@
 source("Utils.R");
 
 EMPTY_VECTOR <- rep(0, length(CLASSES))
-names(EMPTY_VECTOR) <- paste("c", CLASSES, sep="");
+names(EMPTY_VECTOR) <- COL_CLASS_NAMES;
 
 ## rbinds numSet to wholeSet, keeping colnames from numSet and
 ## reassigning fresh rownames and returns the result
@@ -29,11 +29,11 @@ addToTrainSet <- function(trainSet, img, trueClass) {
     scaledImg <- resize(img, w=TRAIN_WIDTH, h=TRAIN_HEIGHT); ## auto keep-ratio? / filter="none"/"bilinear"?
     ## "flatten" image (2D df -> 1D vector)
     flatImg <- c(scaledImg, recursive=T);
-    names(flatImg) <- paste("i", 1:(TRAIN_WIDTH*TRAIN_HEIGHT), sep="");
+    names(flatImg) <- COL_IMG_NAMES;
       ###print(">>>addToTrainSet::names(flatImg)");      print(names(flatImg));
     ## Add Class info
     class <- EMPTY_VECTOR
-    class[p("c",trueClass)] <- 1
+    class[class2col(trueClass)] <- 1
       ###print(">>>addToTrainSet::names(class)");      print(names(class));
 
     newData    <- rbind(trainSet$data, flatImg);
@@ -142,9 +142,7 @@ loadTrainSetFromCSV <- function(prefix) {
 ## Re-arrange trainSet by concatenating Data+Classes, particularly for NeuralNet lib
 mergeDataAndClasses <- function(trainSet) {
     trainSetPlusClass <- cbind(trainSet$data, trainSet$classes);
-    inames <- paste("i", 1:(TRAIN_WIDTH*TRAIN_HEIGHT), sep="");
-    cnames <- paste("c", CLASSES, sep="");
-    colnames(trainSetPlusClass) <- c(inames,cnames);
+    colnames(trainSetPlusClass) <- c(COL_IMG_NAMES, COL_CLASS_NAMES);
     return(trainSetPlusClass);
 }
 
