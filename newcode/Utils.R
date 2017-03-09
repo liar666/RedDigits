@@ -46,6 +46,7 @@ TRAIN_HEIGHT  <- 14;
 
 ### Third of the size/area of the image, to be used as rule of thumb for hidden layer size
 SIZE_THIRD    <- TRAIN_WIDTH*TRAIN_HEIGHT/3;
+SIZE_CUBE     <- TRAIN_WIDTH*TRAIN_HEIGHT*3;
 
 ### The names (factors) of the classes to be detected: numbers 0->9+E+H
 CLASSES <- as.factor(c(0:9,"E","H"));
@@ -65,3 +66,6 @@ generateFormula <- function(leftVars, rightVars) {
     formula <- as.formula(paste(paste(leftVars, collapse = "+"), "~", paste(rightVars, collapse="+")));
     return(formula);
 }
+
+normL2 <- function(x) { norm(x, type="2"); }
+# normL2 <- function(x) { sqrt(sum(x^2)); }

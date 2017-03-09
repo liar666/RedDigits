@@ -168,8 +168,22 @@ classesProbabilitesToClassNumber <- function(preds) {
 main <- function() {
     filename <- p(OUTDIR_TRAINSET,"trainSet");
     trainSet <- generateTrainSet();
+    ## Save full trainSet in 2 separate files: data / classes
     saveTrainSetToCSV(trainSet, filename);
     #trainSet2 <- loadTrainSetFromCSV(filename);
+    ## Save full trainSet in 1 single file
     trainSetPlusClass <- mergeDataAndClasses(trainSet);
     write.csv(trainSetPlusClass, p(filename,"Whole.csv"));
+
+    ## Save trainSet cols names in environment
+    dataCols  <<- grep("i[0-9]*",  colnames(trainSetPlusClass));
+    classCols <<- grep("c[0-9]*", colnames(trainSetPlusClass));
+
+    ## Split into Train/Test sets
+    sampleIdx <<- sample.int(nrow(trainSetPlusClass), round(.9*nrow(trainSetPlusClass)), replace=FALSE);
+    train <- trainSetPlusClass[sampleIdx,];
+    test  <- trainSetPlusClass[-sampleIdx,];
+    ## Save Train & Test sets in single data+classes files
+    write.csv(x=train, p(OUTDIR_TRAINSET,"trainWhole.csv"));
+    write.csv(x=test, p(OUTDIR_TRAINSET,"testWhole.csv"));
 }

@@ -1,25 +1,36 @@
 library("neuralnet");
 
-source("TrainSet.R");  # Already load Utils.R
+source("TrainSet.R");  # Already loads Utils.R
 
 ################################### Load dataset
 
-#trainSet <- loadTrainSetFromCSV("../trainsets/trainSet");
-#trainSetPlusClass <- mergeDataAndClasses(trainSet);
+###trainSet <- loadTrainSetFromCSV("../trainsets/trainSet");
+###trainSetPlusClass <- mergeDataAndClasses(trainSet);
 filename <- "/home/gmuller/Perso/RedDigits/trainsets/trainSet";
 trainSetPlusClass <- read.csv(paste(filename,"Whole.csv",sep=""));
+
+### Removing line/example number
+trainSetPlusClass <- trainSetPlusClass[,c(-1)];
+
+
+
+################################### Split into Train/Test sets
 
 # TODO: use these vectors below, not trainSetPlusClass
 idx <- sample.int(nrow(trainSetPlusClass), round(.9*nrow(trainSetPlusClass)), replace=FALSE);
 train <- trainSetPlusClass[idx,];
 test  <- trainSetPlusClass[-idx,];
 
+
+
+
 ################################## Compute a few models
 formula <- generateFormula(COL_CLASS_NAMES, COL_IMG_NAMES);
 
 ## Worked for simple digits in B&W
 print(paste(date(),"Fiting 1st NN..."));
-fitNN1 <- neuralnet(formula, data=train, hidden=c(SIZE_THIRD), threshold=0.01);
+fitNN1 <- neuralnet(formula, data=test, hidden=c(SIZE_THIRD), threshold=0.01, lifesign='full'); # 'minimal'/'full'/'none'
+##fitNN1 <- neuralnet(formula, data=train, hidden=c(SIZE_THIRD), threshold=0.01, lifesign='minimal'); # 'minimal'/'full'/'none'
 print(paste(date(),"Fiting 2nd NN..."));
 ##fitNN2 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD), linear.output=T, threshold=0.01)
 ##fitNN3 <- neuralnet(formula, data=trainSetPlusClass, hidden=c(SIZE_THIRD*2, SIZE_THIRD, SIZE_THIRD*2), threshold=0.01)
