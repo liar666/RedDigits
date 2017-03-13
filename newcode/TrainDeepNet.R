@@ -5,14 +5,14 @@ source("TrainSet.R");  # Already loads Utils.R
 ################################### Load dataset
 
 filenameTrain <- p(OUTDIR_TRAINSET, "splitted/trainWhole.csv");
-filenameTest  <- p(OUTDIR_TRAINSET, "splitted/testWhole.csv");
 train <- read.csv(filenameTrain);
 train <- train[,c(-1)];
+filenameTest  <- p(OUTDIR_TRAINSET, "splitted/testWhole.csv");
 test  <- read.csv(filenameTest);
 test  <- test[,c(-1)];
 
-dataCols  <- grep("^i",colnames(train))
-classCols <- grep("^c",colnames(train))
+dataCols  <- grep("^i",colnames(test));
+classCols <- grep("^c",colnames(test));
 
 
 ### TODO Seb: compte norm L2 on images
@@ -82,3 +82,5 @@ predsTest  <- nn.predict(fitDN, test[,dataCols]);
 out    <- classesProbabilitesToClassNumber(predsTest);
 wanted <- classesProbabilitesToClassNumber(test[,classCols]);
 table(out, wanted);
+
+
