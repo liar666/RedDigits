@@ -4,9 +4,15 @@ source("TrainSet.R");  # Already loads Utils.R
 
 ################################### Load dataset
 
-###filename <- "/home/gmuller/Perso/RedDigits/trainsets/train"; ## TODO: in prod, use file "trainWhole.csv"
-filename <- "/home/gmuller/Perso/RedDigits/trainsets/test";
-train <- read.csv(paste(filename,"Whole.csv",sep=""));
+filenameTrain <- p(OUTDIR_TRAINSET, "splitted/trainWhole.csv");
+train <- read.csv(filenameTrain);
+train <- train[,c(-1)];
+filenameTest  <- p(OUTDIR_TRAINSET, "splitted/testWhole.csv");
+test  <- read.csv(filenameTest);
+test  <- test[,c(-1)];
+
+dataCols  <- grep("^i",colnames(test));
+classCols <- grep("^c",colnames(test));
 
 
 ### TODO Seb: compte norm L2 on images
@@ -70,9 +76,11 @@ load(p(OUTDIR_MODELS,"DeepNet3.rda"));
 ###################################" Evaluation
 fitDN <- fitDN3
 
-predsTrain <- nn.predict(fitDN, train); ### BOF: testing on learning data :{
+## predsTrain <- nn.predict(fitDN, train[,dataCols]); ### BOF: testing on learning data :{
 predsTest  <- nn.predict(fitDN, test[,dataCols]);
 
 out    <- classesProbabilitesToClassNumber(predsTest);
 wanted <- classesProbabilitesToClassNumber(test[,classCols]);
 table(out, wanted);
+
+
