@@ -82,5 +82,3 @@ predsTest  <- nn.predict(fitDN, test[,dataCols]);
 out    <- classesProbabilitesToClassNumber(predsTest);
 wanted <- classesProbabilitesToClassNumber(test[,classCols]);
 table(out, wanted);
-
-
