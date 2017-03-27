@@ -9,9 +9,9 @@ source("TrainSet.R");  # Already loads Utils.R
 filenameTrain <- p(TRAINSET_DIR, "/splitted/trainWhole.csv");
 filenameTest  <- p(TRAINSET_DIR, "/splitted/testWhole.csv");
 train <- read.csv(filenameTrain);
-train <- train[,c(-1)]
+train <- train[,c(-1)];
 test  <- read.csv(filenameTest);
-test  <- ttest[,c(-1)]
+test  <- test[,c(-1)];
 
 
 ################################## Compute a few models
