@@ -2,8 +2,7 @@
 ### DONE: add loop to generate bigger trainset
 ### DONE 2a: remove useless files in same dir
 ### DONE 2b: split this one in Utils / genTrainSet / Train / Use
-### TODO: verify places for images/trainset/models
-### TODO 3: use original images + norme L2
+### DONE: verify places for images/trainset/models
 
 ### Set seed for reproducible experiments
 set.seed (2016)
