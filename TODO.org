@@ -1,0 +1,3 @@
+* TODO Add an "Other" class with example images
+* TODO Use original (red) images (+ norme L2?)
+* TODO Finish detector
