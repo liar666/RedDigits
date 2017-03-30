@@ -33,6 +33,12 @@ computeRange <- function(color, tolerance) {
 ## Expects a multi-channel image (RGB => at least 3)
 pickColor <- function(img, color, tolerance) {
 
+    ### DEBUG:
+    ## print(is.Image(img));
+    ## print(colorMode(img));
+    ## print(length(color));
+    ## print(length(tolerance));
+
     ## Verify that img as 3 channels and color&tolerance 3 values
     if(!(is.Image(img) && colorMode(img)==2 && length(color)==3 && length(tolerance)==3)) {
         stop("Argument 'image' is not an image or 'color' or 'tolerence' is not a 3-uple");
