@@ -65,7 +65,7 @@ fitDN3 <- nn.train(x=as.matrix(train[,dataCols]), y=as.matrix(train[,classCols])
                    learningrate_scale=1,
                    activationfun="sigm",
                    output="softmax",       # default="sigm" , can be: sigm/softmax/tanh
-                   numepochs=970,
+                   numepochs=200,
                    batchsize=60,
                    hidden_dropout=0,       #  test with >0?
                    visible_dropout=0);
