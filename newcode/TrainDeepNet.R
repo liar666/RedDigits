@@ -82,20 +82,3 @@ predsTest  <- nn.predict(fitDN, test[,dataCols]);
 out    <- classesProbabilitesToClassNumber(predsTest);
 wanted <- classesProbabilitesToClassNumber(test[,classCols]);
 table(out, wanted);
-
-source("../code/pick.R");
-img<-readImage("../images/numbers_orig/5.png");
-display(img);
-img<-pickColor(img,c(1.0,0.0,0.0),c(.2,.2,.3));
-img2<-channel(img,"red");
-display(img2);
-img2<-img2>.5;
-img2 <- sharpenImage(img2,.3);
-display(img2);
-img3<-resize(img2, 10, 14);
-display(img3)
-flatImg <- c(img3, recursive=T);
-flatDF <- as.data.frame(t(flatImg));
-names(flatDF) <- colnames(test[,dataCols])
-preds <- nn.predict(fitDN3, flatDF);
-names(test)[140+max.col(preds)];
