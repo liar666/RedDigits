@@ -4,11 +4,13 @@ source("TrainSet.R");  # Already loads Utils.R
 
 ################################### Load dataset
 
-filenameTrain <- p(OUTDIR_TRAINSET, "splitted/trainWhole.csv");
-train <- read.csv(filenameTrain);
+##filenameTrain <- p(OUTDIR_TRAINSET, "splitted/trainWhole.csv");
+##train <- read.csv(filenameTrain);
+load(p(OUTDIR_TRAINSET, "splitted/trainWhole.RData"))
 train <- train[,c(-1)];
-filenameTest  <- p(OUTDIR_TRAINSET, "splitted/testWhole.csv");
-test  <- read.csv(filenameTest);
+##filenameTest  <- p(OUTDIR_TRAINSET, "splitted/testWhole.csv");
+##test  <- read.csv(filenameTest);
+load(p(OUTDIR_TRAINSET, "splitted/testWhole.RData"))
 test  <- test[,c(-1)];
 
 dataCols  <- grep("^i",colnames(test));
