@@ -54,9 +54,11 @@ addToTrainSet <- function(trainSet, img, trueClass) {
 ##  20/5 * 20/5 * 2/.5 * .4/.1 =49152 images to learn on.
 generateTrainSet <- function() {
     trainSet <- list(data=data.frame(), classes=data.frame())
-    for (cl in CLASSES) {
+
+    ## Treating examples of numbers
+    for (cl in CLASSES[c(-length(CLASSES))]) {
         ## Read/Load original image
-        origImg <- readImage(p(INDIR_IMAGES,cl,".png"));
+        origImg <- readImage(p(INDIR_IMAGES_NUM,cl,".png"));
         imgSize <- dim(origImg);
 
         print(paste(date(), "Treating Class: ", cl));
@@ -107,6 +109,17 @@ generateTrainSet <- function() {
         print(paste("New trainSet size: ", object.size(trainSet)));
     } # classes/"numbers"
 
+    ## Treating counter examples
+    trainSetAux <- list(data=data.frame(), classes=data.frame())  ## to split in smallest set => speedup?
+    for (ce in list.files(INDIR_IMAGES_OTHER)) {
+        ceImg <- readImage(p(INDIR_IMAGES_NUM,ce));
+        print(paste(date(), "Treating Counter-Example: ", ce));
+        trainSetAux <- addToTrainSet(trainSetAux, ceImg, CLASSES[length(CLASSES)]);
+    }
+    trainSet <- mergeSets(trainSet,trainSetAux);
+    rm(trainSetAux); # cleans up memory
+    print(paste("New trainSet size: ", object.size(trainSet)));
+
     return(trainSet);
 }
 
@@ -126,9 +139,11 @@ showImg <- function(trainSet, row) {
 
 
 # saves "trainSet" to Data+Classes files starting with "prefix"
-saveTrainSetToCSV <- function(trainSet, prefix) {
+saveTrainSet <- function(trainSet, prefix) {
     write.csv(x=trainSet$data, p(prefix,"Data.csv"));
+    save(trainset$data, p(prefix,"Data.RData"));
     write.csv(x=trainSet$classes, p(prefix,"Classes.csv"));
+    save(trainset$classes, p(prefix,"Classes.RData"));
 }
 
 # reloads "trainSet" from Data+Classes files starting with "prefix"
@@ -169,7 +184,7 @@ main <- function() {
     filename <- p(OUTDIR_TRAINSET,"trainSet");
     trainSet <- generateTrainSet();
     ## Save full trainSet in 2 separate files: data / classes
-    saveTrainSetToCSV(trainSet, filename);
+    saveTrainSet(trainSet, filename);
     #trainSet2 <- loadTrainSetFromCSV(filename);
     ## Save full trainSet in 1 single file
     trainSetPlusClass <- mergeDataAndClasses(trainSet);
@@ -186,4 +201,5 @@ main <- function() {
     ## Save Train & Test sets in single data+classes files
     write.csv(x=train, p(OUTDIR_TRAINSET,"trainWhole.csv"));
     write.csv(x=test, p(OUTDIR_TRAINSET,"testWhole.csv"));
+    save(c("train","test"), file=p(OUTDIR_TRAINSET,"train+test.RData"));
 }
