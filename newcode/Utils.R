@@ -29,15 +29,16 @@ pixel2col <- function(pixelNb) {
 library("EBImage")
 
 ### Main dir (changes from machine to machine)
-WORKDIR <- "~/Perso/RedDigits/"
+WORKDIR <- "~/NEW_SAINTETIENNE/Perso/RedDigits/"
 
 ### Directories where to store outputs
-INDIR_IMAGES    <- p(WORKDIR,"/images/preprocessed/");
-##INDIR_IMAGES    <- p(WORKDIR,"/images/numbers_orig/");
-##INDIR_IMAGES    <- p(WORKDIR,"/images/numbers_cleaned/");
-OUTDIR_IMAGES   <- p(WORKDIR,"/images/trainset/");
-OUTDIR_TRAINSET <- p(WORKDIR,"/trainsets/");
-OUTDIR_MODELS   <- p(WORKDIR,"/models/");
+##INDIR_IMAGES_NUM <- p(WORKDIR,"/images/preprocessed/");
+##INDIR_IMAGES_NUM <- p(WORKDIR,"/images/numbers_orig/");
+INDIR_IMAGES_NUM   <- p(WORKDIR,"/images/numbers_cleaned/");
+INDIR_IMAGES_OTHER <- p(WORKDIR,"/images/non_numbers/");
+OUTDIR_IMAGES      <- p(WORKDIR,"/images/trainset/");
+OUTDIR_TRAINSET    <- p(WORKDIR,"/trainsets/");
+OUTDIR_MODELS      <- p(WORKDIR,"/models/");
 
 ### Width and Height of the (reduced) images on which learning will occur
 TRAIN_WIDTH   <- 10;
@@ -48,7 +49,7 @@ SIZE_THIRD    <- TRAIN_WIDTH*TRAIN_HEIGHT/3;
 SIZE_CUBE     <- TRAIN_WIDTH*TRAIN_HEIGHT*3;
 
 ### The names (factors) of the classes to be detected: numbers 0->9+E+H
-CLASSES <- as.factor(c(0:9,"E","H"));
+CLASSES <- as.factor(c(0:9,"E","H","OTHER"));
 
 # Columns names
 COL_IMG_NAMES   <- pixel2col(1:(TRAIN_WIDTH*TRAIN_HEIGHT));
