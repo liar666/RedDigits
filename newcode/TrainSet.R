@@ -58,7 +58,8 @@ generateTrainSet <- function() {
     ## Treating examples of numbers
     for (cl in CLASSES[c(-length(CLASSES))]) {
         ## Read/Load original image
-        origImg <- readImage(p(INDIR_IMAGES_NUM,cl,".png"));
+        origImg <- readImage(p(INDIR_IMAGES_NUM, cl, ".png"));
+        origImg <- ensureImageDimensions(origImg);
         imgSize <- dim(origImg);
 
         print(paste(date(), "Treating Class: ", cl));
@@ -112,7 +113,8 @@ generateTrainSet <- function() {
     ## Treating counter examples
     trainSetAux <- list(data=data.frame(), classes=data.frame())  ## to split in smallest set => speedup?
     for (ce in list.files(INDIR_IMAGES_OTHER)) {
-        ceImg <- readImage(p(INDIR_IMAGES_NUM,ce));
+        ceImg <- readImage(p(INDIR_IMAGES_OTHER, ce));
+        ceImg <- ensureImageDimensions(ceImg);
         print(paste(date(), "Treating Counter-Example: ", ce));
         trainSetAux <- addToTrainSet(trainSetAux, ceImg, CLASSES[length(CLASSES)]);
     }
