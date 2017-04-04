@@ -143,9 +143,9 @@ showImg <- function(trainSet, row) {
 # saves "trainSet" to Data+Classes files starting with "prefix"
 saveTrainSet <- function(trainSet, prefix) {
     write.csv(x=trainSet$data, p(prefix,"Data.csv"));
-    save(trainset$data, p(prefix,"Data.RData"));
+    save(trainSet$data, p(prefix,"Data.RData"));
     write.csv(x=trainSet$classes, p(prefix,"Classes.csv"));
-    save(trainset$classes, p(prefix,"Classes.RData"));
+    save(trainSet$classes, p(prefix,"Classes.RData"));
 }
 
 # reloads "trainSet" from Data+Classes files starting with "prefix"
