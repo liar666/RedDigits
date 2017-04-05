@@ -202,5 +202,5 @@ main <- function() {
     ## Save Train & Test sets in single data+classes files
     write.csv(x=train, p(OUTDIR_TRAINSET,"trainWhole.csv"));
     write.csv(x=test, p(OUTDIR_TRAINSET,"testWhole.csv"));
-    save(c("train","test"), file=p(OUTDIR_TRAINSET,"train+test.RData"));
+    save(train, test, file=p(OUTDIR_TRAINSET,"train+test.RData"));
 }
