@@ -29,7 +29,7 @@ pixel2col <- function(pixelNb) {
 library("EBImage")
 
 ### Main dir (changes from machine to machine)
-WORKDIR <- "~/NEW_SAINTETIENNE/Perso/RedDigits/"
+WORKDIR <- "~/Perso/RedDigits/"
 
 ### Directories where to store outputs
 ##INDIR_IMAGES_NUM <- p(WORKDIR,"/images/preprocessed/");
@@ -37,7 +37,7 @@ WORKDIR <- "~/NEW_SAINTETIENNE/Perso/RedDigits/"
 INDIR_IMAGES_NUM   <- p(WORKDIR,"/images/numbers_cleaned/");
 INDIR_IMAGES_OTHER <- p(WORKDIR,"/images/non_numbers/");
 OUTDIR_IMAGES      <- p(WORKDIR,"/images/trainset/");
-OUTDIR_TRAINSET    <- p(WORKDIR,"/trainsets/");
+OUTDIR_TRAINSET    <- p(WORKDIR,"/trainsets/BlackAndRed/");
 OUTDIR_MODELS      <- p(WORKDIR,"/models/");
 
 ### Width and Height of the (reduced) images on which learning will occur
