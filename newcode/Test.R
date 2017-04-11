@@ -16,48 +16,66 @@
 ## names(test)[140+max.col(preds)];
 
 
-source("../code/pick.R");
+## source("../code/pick.R");
 
-FOREGROUND <- c(1.0,0.0,0.0);
-FOREGROUND_MARGINS <- c(0.3,0.2,0.2);
-FOREGROUND_THRESHOLD <- .85;
+## FOREGROUND <- c(1.0,0.0,0.0);
+## FOREGROUND_MARGINS <- c(0.3,0.2,0.2);
+## FOREGROUND_THRESHOLD <- .85;
 
 
-### Erodes the borders
-sharpenImage <- function(image, force) {
-    kern <- makeBrush(force, shape='disc'); # force was 5 in docs
-    return(erode(image, kern));
-}
+## ### Erodes the borders
+## sharpenImage <- function(image, force) {
+##     kern <- makeBrush(force, shape='disc'); # force was 5 in docs
+##     return(erode(image, kern));
+## }
 
-preprocess <- function(img) {
-    img <- sharpenImage(img, 2);
-    if(colorMode(img)==2) {
-        redImg  <- pickColor(img, FOREGROUND, FOREGROUND_MARGINS);
-        redChan <- channel(redImg,"red") > FOREGROUND_THRESHOLD;
-        return(redChan);
-    }
-    return(img);
-}
-five  <- readImage("../images/numbers_orig/5.png");
-## Sharpen first, then preprocess (DEACTIVATE sharpening inside preprocess)
-five2 <- sharpenImage(five, 3);
-five2 <- preprocess(five2);
-display(five2);
-## Preprocess then sharpen (DEACTIVATE sharpening inside preprocess)
-five3 <- preprocess(five);
-five4 <- sharpenImage(five3, 3);
-display(five4);
+## preprocess <- function(img) {
+##     img <- sharpenImage(img, 2);
+##     if(colorMode(img)==2) {
+##         redImg  <- pickColor(img, FOREGROUND, FOREGROUND_MARGINS);
+##         redChan <- channel(redImg,"red") > FOREGROUND_THRESHOLD;
+##         return(redChan);
+##     }
+##     return(img);
+## }
+fiveName   <- "../images/numbers_cleaned/5.png";
+otherName  <- "../images/non_numbers/cartoon5.png";
+other2Name <- "/usr/share/app-install/icons/xaos.png";
+five  <- readImage(fiveName);
+other <- readImage(otherName);
+other2<- readImage(other2Name);
+## ## Sharpen first, then preprocess (DEACTIVATE sharpening inside preprocess)
+## five2 <- sharpenImage(five, 3);
+## five2 <- preprocess(five2);
+## display(five2);
+## ## Preprocess then sharpen (DEACTIVATE sharpening inside preprocess)
+## five3 <- preprocess(five);
+## five4 <- sharpenImage(five3, 3);
+## display(five4);
 
-predictImage <- function(img, model, predFunc) {
-    img2 <- preprocess(img); ## sharp+reduce colors+seuil=>crisp BW...
+predictImageDistr <- function(img, model, predFunc) {
+    #img2 <- preprocess(img); ## sharp+reduce colors+seuil=>crisp BW...
+    img2 <- removeAlphaChannel(img);
     scaledImg <- resize(img2, w=TRAIN_WIDTH, h=TRAIN_HEIGHT); ## auto keep-ratio? / filter="none"/"bilinear"?
     flatImg <- c(scaledImg, recursive=T);
     names(flatImg) <- COL_IMG_NAMES;
-    predFunc(model, flatImg); ### flatImg[dataCols]
+    preds <- predFunc(model, t(as.data.frame(flatImg))); ### flatImg[dataCols]
+    return(preds);
 }
-predictImage(five, fitDN3, nn.predict);
+predictImage <- function(img, model, predFunc) {
+    return(classesProbabilitesToClassNumber(predictImageDistr(img,model,predFunc)));
+}
+predictImage(five, fitDN, nn.predict);
+predictImage(other, fitDN, nn.predict);
+predictImage(other2, fitDN, nn.predict);
 
-predictFile <- function(filename, predFun) {
+predictFileDistr <- function(filename, model, predFun) {
     origImg <- readImage(filename);
-    return(predictImage(origImag));
+    return(predictImageDistr(origImg, model, predFun));
 }
+predictImage <- function(filename, model, predFun) {
+    return(classesProbabilitesToClassNumber(predictFileDistr(filename,model,predFunc)));
+}
+predictImage(fiveName, fitDN, nn.predict);
+predictImage(otherName, fitDN, nn.predict);
+predictImage(other2Name, fitDN, nn.predict);
