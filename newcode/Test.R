@@ -1,3 +1,8 @@
+library("deepnet");
+library("EBImage");
+
+source("Utils.R");
+
 ## source("../code/pick.R");
 ## img<-readImage("../images/numbers_orig/5.png");
 ## display(img);
@@ -65,17 +70,23 @@ predictImageDistr <- function(img, model, predFunc) {
 predictImage <- function(img, model, predFunc) {
     return(classesProbabilitesToClassNumber(predictImageDistr(img,model,predFunc)));
 }
-predictImage(five, fitDN, nn.predict);
-predictImage(other, fitDN, nn.predict);
-predictImage(other2, fitDN, nn.predict);
 
-predictFileDistr <- function(filename, model, predFun) {
+predictFileDistr <- function(filename, model, predFunc) {
     origImg <- readImage(filename);
-    return(predictImageDistr(origImg, model, predFun));
+    return(predictImageDistr(origImg, model, predFunc));
 }
-predictImage <- function(filename, model, predFun) {
+predictFile <- function(filename, model, predFunc) {
     return(classesProbabilitesToClassNumber(predictFileDistr(filename,model,predFunc)));
 }
-predictImage(fiveName, fitDN, nn.predict);
-predictImage(otherName, fitDN, nn.predict);
-predictImage(other2Name, fitDN, nn.predict);
+
+
+main <- function() {
+    load(p(OUTDIR_MODELS,"DeepNet5.rda.ASUSTaffOnRedTrainSet+1pcdropout"))
+    fitDN <- fitDN5;
+    print(predictImage(five, fitDN, nn.predict));
+    print(predictImage(other, fitDN, nn.predict));
+    print(predictImage(other2, fitDN, nn.predict));
+    print(predictFile(fiveName, fitDN, nn.predict));
+    print(predictFile(otherName, fitDN, nn.predict));
+    print(predictFile(other2Name, fitDN, nn.predict));
+}
