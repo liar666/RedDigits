@@ -29,7 +29,7 @@ pixel2col <- function(pixelNb) {
 library("EBImage")
 
 ### Main dir (changes from machine to machine)
-WORKDIR <- "~/Perso/RedDigits/"
+WORKDIR <- "~/NEW_SAINTETIENNE/Perso/RedDigits/"
 
 ### Directories where to store outputs
 ##INDIR_IMAGES_NUM <- p(WORKDIR,"/images/preprocessed/");
@@ -38,7 +38,7 @@ INDIR_IMAGES_NUM   <- p(WORKDIR,"/images/numbers_cleaned/");
 INDIR_IMAGES_OTHER <- p(WORKDIR,"/images/non_numbers/");
 OUTDIR_IMAGES      <- p(WORKDIR,"/images/trainset/");
 OUTDIR_TRAINSET    <- p(WORKDIR,"/trainsets/BlackAndRed/");
-OUTDIR_MODELS      <- p(WORKDIR,"/models/");
+OUTDIR_MODELS      <- p(WORKDIR,"/models//BlackAndRed/");
 
 ### Width and Height of the (reduced) images on which learning will occur
 TRAIN_WIDTH   <- 10;
@@ -97,3 +97,33 @@ generateFormula <- function(leftVars, rightVars) {
 
 normL2 <- function(x) { norm(x, type="2"); }
 # normL2 <- function(x) { sqrt(sum(x^2)); }
+
+## NOT used: applies a threshold to obtain a boolean image
+toBooleanImage <- function(img) {
+     return(img>.5)
+}
+
+# Displays an image, for debugging purposes
+showImg <- function(trainSet, row) {
+    flatImg <- trainSet$data[row,];
+    img <- matrix(flatImg, nrow=TRAIN_WIDTH);
+    i <- Image(img, c(TRAIN_WIDTH,TRAIN_HEIGHT), "Grayscale");
+    display(i);
+}
+
+
+## Returns a vector of all 0s, but at the position of the max, which is set to 1.
+binarizeCol <- function(row) {
+    a<-rep(0,length(row));
+    a[which.max(row)]<-1;
+    return(a);
+}
+## Returns a data.frame with 1 where the value was the max of the row, 0 elsewhere in the row
+binarizePreds <- function(preds) {
+    return(apply(X=preds, MARGIN=1, FUN=binarizeCol))
+}
+
+## Transforms a dataframe of probabilities for each class of each example/row into a column vector with the most probable class for each example/row
+classesProbabilitesToClassNumber <- function(preds) {
+    return(CLASSES[max.col(preds)]);
+}

@@ -126,20 +126,6 @@ generateTrainSet <- function() {
 }
 
 
-## NOT used: applies a threshold to obtain a boolean image
-toBooleanImage <- function(img) {
-     return(img>.5)
-}
-
-# Displays an image, for debugging purposes
-showImg <- function(trainSet, row) {
-    flatImg <- trainSet$data[row,];
-    img <- matrix(flatImg, nrow=TRAIN_WIDTH);
-    i <- Image(img, c(TRAIN_WIDTH,TRAIN_HEIGHT), "Grayscale");
-    display(i);
-}
-
-
 # saves "trainSet" to Data+Classes files starting with "prefix"
 saveTrainSet <- function(trainSet, prefix) {
     write.csv(x=trainSet$data, p(prefix,"Data.csv"));
@@ -160,24 +146,6 @@ mergeDataAndClasses <- function(trainSet) {
     trainSetPlusClass <- cbind(trainSet$data, trainSet$classes);
     colnames(trainSetPlusClass) <- c(COL_IMG_NAMES, COL_CLASS_NAMES);
     return(trainSetPlusClass);
-}
-
-################################## Re-arrange and check results
-
-## Returns a vector of all 0s, but at the position of the max, which is set to 1.
-binarizeCol <- function(row) {
-    a<-rep(0,length(row));
-    a[which.max(row)]<-1;
-    return(a);
-}
-## Returns a data.frame with 1 where the value was the max of the row, 0 elsewhere in the row
-binarizePreds <- function(preds) {
-    return(apply(X=preds, MARGIN=1, FUN=binarizeCol))
-}
-
-## Transforms a dataframe of probabilities for each class of each example/row into a column vector with the most probable class for each example/row
-classesProbabilitesToClassNumber <- function(preds) {
-    return(CLASSES[max.col(preds)]);
 }
 
 ## Main method. Call this to check methods in this file & generate to trainsSet CSV files
