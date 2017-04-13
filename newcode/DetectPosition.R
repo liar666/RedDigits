@@ -1,3 +1,10 @@
+## library("deepnet");
+## library("EBImage");
+
+## source("Utils.R");
+
+source("Test.R");
+
 convertPosition <- function(bbox, globalImage) {
     positionText <- "";
     tl <- bbox$TopLeft;
@@ -45,18 +52,24 @@ SIZE_STEP <- 5;
 
 
 extractSubImage <- function(img, pos) {
-    return(as.Image(img[pos$TopLeft[1]:pos$BottomRight[1], pos$TopLeft[2]:pos$BottomRight[2]]));
+    return(as.Image(img[pos$TopLeft[1]:pos$BottomRight[1], pos$TopLeft[2]:pos$BottomRight[2],]));
 }
-f = system.file("images", "sample.png", package="EBImage");
-img = readImage(f);
-display(img);
-img2 <- extractSubImage(img,list(TopLeft=c(10,10),BottomRight=c(100,100)));
-display(img2);
+## f = system.file("images", "sample.png", package="EBImage");
+## img = readImage(f);
+## display(img);
+## img2 <- extractSubImage(img,list(TopLeft=c(10,10),BottomRight=c(100,100)));
+## display(img2);
+
+load("../models/BlackAndRed/DeepNet5.rda.ASUSTaffOnRedTrainSet+1pcdropout");
+MODEL     <- fitDN5;  # rm(fitDN5);
+PRED_FUNC <- nn.predict;
 
 findNumbers <- function(img) {
     width  <- dim(img)[[1]];
     height <- dim(img)[[2]];
-    ratio  <- height/width;
+    ratio  <- height/width;  # use TRAIN_HEIGHT/TRAIN_WIDTH
+
+    positions <- list();
 
     ## For all sizes
     for(sampleW in seq(SIZE_STEP, width, SIZE_STEP)) {
@@ -64,11 +77,22 @@ findNumbers <- function(img) {
         ## For all possible positions w/r to current sample size
         for(xPos in seq(0, width-sampleW, SIZE_STEP)) {
             for(yPos in seq(0, height-sampleH, SIZE_STEP)) {
-                toTest <- extractSubImage(img, list(TopLeft=c(xPos,yPos), BottomRight=c(xPos+sampleW,yPos+sampleH)));
-                val <- predictImage(toTest);
-                ## TODO: finish !!!! Manage junk case!!!!
+                bbox <- list(TopLeft=c(xPos,yPos), BottomRight=c(xPos+sampleW,yPos+sampleH));
+                toTest <- extractSubImage(img, bbox);
+                val <- predictImage(toTest, MODEL, PRED_FUNC);
+                if (val!=CLASSES[length(CLASSES)]) {
+                    center <- c(xPos+sampleW/2,yPos+sampleH/2);
+                    print(p("Number ", val, " found at (",center[1],center[2],"): ", convertPosition(bbox,img)));
+                    positions <- c(positions, bbox);
+                }
             }
         }
     }
+}
 
+# todo write a method that draws the bbox-es on top of the image
+
+main <- function() {
+    multipleDigits <- readImage("../images/originals/ec9f9e3929808508a30bee101cb99572.jpg");
+    findNumbers(multipleDigits);
 }
