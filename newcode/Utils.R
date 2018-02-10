@@ -26,10 +26,10 @@ pixel2col <- function(pixelNb) {
     return(toColName("i", pixelNb));
 }
 
-library("EBImage")
+library("EBImage");
 
 ### Main dir (changes from machine to machine)
-WORKDIR <- "~/NEW_SAINTETIENNE/Perso/RedDigits/"
+WORKDIR <- "~/Perso/RedDigits/";
 
 ### Directories where to store outputs
 ##INDIR_IMAGES_NUM <- p(WORKDIR,"/images/preprocessed/");
@@ -41,8 +41,8 @@ OUTDIR_TRAINSET    <- p(WORKDIR,"/trainsets/BlackAndRed/");
 OUTDIR_MODELS      <- p(WORKDIR,"/models//BlackAndRed/");
 
 ### Width and Height of the (reduced) images on which learning will occur
-TRAIN_WIDTH   <- 10;
-TRAIN_HEIGHT  <- 14;
+TRAIN_WIDTH   <- 20;
+TRAIN_HEIGHT  <- 28;
 IMG_DEPTH     <- 3; # TODO: ensure RGB images!
 
 ### Third of the size/area of the image, to be used as rule of thumb for hidden layer size

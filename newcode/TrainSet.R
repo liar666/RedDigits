@@ -65,6 +65,7 @@ generateTrainSet <- function() {
         print(paste(date(), "Treating Class: ", cl));
 
         trainSetAux <- list(data=data.frame(), classes=data.frame())  ## to split in smallest set => speedup?
+        ### TODO: OPTIMIZE BY MOVING EACH OPERATION IN ITS LOOP!!!
         for(tilt in seq(from=-.4,to=.4,by=.2)) {
             ##for(tilt in seq(from=-.4,to=.4,length.out=5)) {
             mconvol <- matrix(c(1,tilt,-tilt*imgSize[[1]],0,1,0), ncol=2)
