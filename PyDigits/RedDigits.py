@@ -5,47 +5,30 @@
 First attempt at building a induction cooking plate's digits detector in python
 """
 
-import numpy as np
-
-from skimage import feature, filters  # data, io,
-from skimage.morphology import label
-from skimage.measure import regionprops
-
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
+
+
+import Detector as dt
 
 BASE_DIR    = "/home/guigui/GMCodes/RedDigits/"
 IMAGE_DIR   = BASE_DIR + "/images/"
 CLEANED_DIR = IMAGE_DIR + "/numbers_cleaned/"
+DETECT_DIR  = IMAGE_DIR + "/detectPosition/"
 
-#image = data.coins()[0:95, 70:370]  # or any NumPy array!
-#image_src = mpimg.imread(CLEANED_DIR + "1.png")
-image_src = mpimg.imread(CLEANED_DIR + "3.png")
-#image_src = mpimg.imread(CLEANED_DIR + "7.png")
-image = np.mean(image_src, -1) # trick to rgb2grey
-image = filters.gaussian(image, sigma=1.04) # trying to merge parts of digit with bluring
-image[image-.25 > 1e-15] = 1
-image[image-.25 <= 1e-15] = 0
-plt.imshow(image, cmap=plt.cm.gray)
+#image1 = CLEANED_DIR + "1.png"
+#image3 = CLEANED_DIR + "3.png"
+#image7 = CLEANED_DIR + "7.png"
+imageComplete3 = DETECT_DIR + "/example_3.png"
+
+detector1 = dt.Detector(imageComplete3)
+detector1.displayImage()
+detector1.detect()
+detector1.displayDetectedPositions()
+
+plt.imshow(detector1.imageOriginal)
 plt.show()
 
-
-edges = feature.canny(image, sigma=1, low_threshold=None, high_threshold=None)
-plt.imshow(edges, cmap=plt.cm.gray)
-plt.show()
-
-
-label_image = label(edges)
-fig, ax = plt.subplots(1)
-plt.imshow(edges, cmap=plt.cm.gray)
-for region in regionprops(label_image):
-    # Draw rectangle around segmented coins.
-    minrow, mincol, maxrow, maxcol = region.bbox
-    print("("+str(minrow)+", "+str(mincol)+")  ("+str(maxrow)+", "+str(maxcol)+")")
-    rect = mpatches.Rectangle((mincol, minrow), maxcol-mincol, maxrow-minrow,
-                              fill=False, edgecolor='red', linewidth=2)
-    ax.add_patch(rect)
+detector1.displayDetectedPositions()
 plt.show()
 
 ## TODOs:
