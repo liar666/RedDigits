@@ -15,10 +15,14 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+BASE_DIR    = "/home/guigui/GMCodes/RedDigits/"
+IMAGE_DIR   = BASE_DIR + "/images/"
+CLEANED_DIR = IMAGE_DIR + "/numbers_cleaned/"
+
 #image = data.coins()[0:95, 70:370]  # or any NumPy array!
-image_src = mpimg.imread("/home/guillaume/dwhelper/Code/RedDigits/images/numbers_cleaned/1.png")
-#image_src = mpimg.imread("/home/guillaume/dwhelper/Code/RedDigits/images/numbers_cleaned/3.png")
-#image_src = mpimg.imread("/home/guillaume/dwhelper/Code/RedDigits/images/numbers_cleaned/7.png")
+#image_src = mpimg.imread(CLEANED_DIR + "1.png")
+image_src = mpimg.imread(CLEANED_DIR + "3.png")
+#image_src = mpimg.imread(CLEANED_DIR + "7.png")
 image = np.mean(image_src, -1) # trick to rgb2grey
 image = filters.gaussian(image, sigma=1.04) # trying to merge parts of digit with bluring
 image[image-.25 > 1e-15] = 1
@@ -33,13 +37,15 @@ plt.show()
 
 
 label_image = label(edges)
-currentAxis = plt.gca()
+fig, ax = plt.subplots(1)
+plt.imshow(edges, cmap=plt.cm.gray)
 for region in regionprops(label_image):
     # Draw rectangle around segmented coins.
-    minr, minc, maxr, maxc = region.bbox
-    rect = mpatches.Rectangle((minc, minr), maxc-minc, maxr-minr,
+    minrow, mincol, maxrow, maxcol = region.bbox
+    print("("+str(minrow)+", "+str(mincol)+")  ("+str(maxrow)+", "+str(maxcol)+")")
+    rect = mpatches.Rectangle((mincol, minrow), maxcol-mincol, maxrow-minrow,
                               fill=False, edgecolor='red', linewidth=2)
-    currentAxis.add_patch(rect)
+    ax.add_patch(rect)
 plt.show()
 
 ## TODOs:
