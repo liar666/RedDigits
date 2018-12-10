@@ -5,31 +5,33 @@
 First attempt at building a induction cooking plate's digits detector in python
 """
 
-import matplotlib.pyplot as plt
+#import DigitModel as dimo
+import DigitPositionDetector as dipo
+import DigitValueDetector as dival
+
+from sklearn import __version__                   # To keep track of current SkLearn version for unloading model
 
 
-import Detector as dt
+# TODO take te image name and model as arguments
+def main():
+    imageComplete3 = dipo.DigitPositionDetector.DETECT_DIR + "/example_3.png"
+    posDect = dipo.DigitPositionDetector(imageComplete3)
+    posDect.detect()
+    digits = posDect.getDetectedDigits()
+    
+    valDect = dival.DigitValueDetector()
+    solver = 'lbfgs'
+    hidden = (100, 50)
+    modelFilename = valDect.MODELS_DIR + "/sklearn_" + __version__ + "_mlp_" + solver + "_" + str(hidden) + ".joblib"
+    valDect.loadModel(modelFilename);
 
-BASE_DIR    = "/home/guigui/GMCodes/RedDigits/"
-IMAGE_DIR   = BASE_DIR + "/images/"
-CLEANED_DIR = IMAGE_DIR + "/numbers_cleaned/"
-DETECT_DIR  = IMAGE_DIR + "/detectPosition/"
-
-#image1 = CLEANED_DIR + "1.png"
-#image3 = CLEANED_DIR + "3.png"
-#image7 = CLEANED_DIR + "7.png"
-imageComplete3 = DETECT_DIR + "/example_3.png"
-
-detector1 = dt.Detector(imageComplete3)
-detector1.displayImage()
-detector1.detect()
-detector1.displayDetectedPositions()
-
-plt.imshow(detector1.imageOriginal)
-plt.show()
-
-detector1.displayDetectedPositions()
-plt.show()
+    for digit in digits:
+        digit.guessedValue = valDect.convertProbas2Class(valDect.testSingleInstance(valDect.imageToFeatures(digit.subImage)))
+        ## TODO convert absolute pixel position to highlevel position
+        print("Seen a "+ digit.guessedValue + " at " + digit.position)
+    
+if __name__ == "__main__":
+    main()
 
 ## TODOs:
 ## 1. Preprocessing1
