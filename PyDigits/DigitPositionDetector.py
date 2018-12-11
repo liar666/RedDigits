@@ -46,8 +46,8 @@ class DigitPositionDetector:
         labels = label(edges)
         for region in regionprops(labels):
             minrow, mincol, maxrow, maxcol = region.bbox
-            subImage = self._imageOriginal[minrow:maxrow][mincol:maxcol]   ### TODO does not work
-            self._detectedDigits.append(dimo.DigitModel(subImage, minrow, mincol, maxrow, maxcol))
+            subImage = self._imageOriginal[minrow:maxrow, mincol:maxcol]
+            self._detectedDigits.append(dimo.DigitModel(self._imageOriginal.shape, subImage, minrow, mincol, maxrow, maxcol))
 
     def displayImage(self):
         plt.imshow(self._imageOriginal)
@@ -87,8 +87,6 @@ def main():
     plt.show()
     
     for digit in detector1.getDetectedDigits():
-        print(digit.subImage)
-        break  ## TODO tofinish
         plt.imshow(digit.subImage)
         plt.show()
 

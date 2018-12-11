@@ -5,6 +5,8 @@
 First attempt at building a induction cooking plate's digits detector in python
 """
 
+import sys    # To get commanline arguments
+
 #import DigitModel as dimo
 import DigitPositionDetector as dipo
 import DigitValueDetector as dival
@@ -12,26 +14,30 @@ import DigitValueDetector as dival
 from sklearn import __version__                   # To keep track of current SkLearn version for unloading model
 
 
-# TODO take te image name and model as arguments
-def main():
-    imageComplete3 = dipo.DigitPositionDetector.DETECT_DIR + "/example_3.png"
-    posDect = dipo.DigitPositionDetector(imageComplete3)
-    posDect.detect()
-    digits = posDect.getDetectedDigits()
-    
-    valDect = dival.DigitValueDetector()
-    solver = 'lbfgs'
-    hidden = (100, 50)
-    modelFilename = valDect.MODELS_DIR + "/sklearn_" + __version__ + "_mlp_" + solver + "_" + str(hidden) + ".joblib"
-    valDect.loadModel(modelFilename);
 
-    for digit in digits:
-        digit.guessedValue = valDect.convertProbas2Class(valDect.testSingleInstance(valDect.imageToFeatures(digit.subImage)))
-        ## TODO convert absolute pixel position to highlevel position
-        print("Seen a "+ digit.guessedValue + " at " + digit.position)
+
+def main(argv):
+    if (len(argv)!=3):
+        print("USAGE: " + argv[0] + " <image file> <model file>")
+        sys.exit(1)
+    else:
+        imageComplete = argv[1] ## dipo.DigitPositionDetector.DETECT_DIR + "/example_3.png"
+        posDect = dipo.DigitPositionDetector(imageComplete)
+        posDect.detect()
+        digits = posDect.getDetectedDigits()
     
+        valDect = dival.DigitValueDetector()
+        solver = 'lbfgs'
+        hidden = (100, 50)
+        modelFilename = argv[2] ## valDect.MODELS_DIR + "/sklearn_" + __version__ + "_mlp_" + solver + "_" + str(hidden) + ".joblib"
+        valDect.loadModel(modelFilename);
+
+        for digit in digits:
+             digit.guessedValue = valDect.convertProbas2Class(valDect.testSingleInstance(valDect.imageToFeatures(digit.subImage)))
+             print("Seen a "+ digit.guessedValue + " at " + digit.fuzzyPosition)
+
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
 
 ## TODOs:
 ## 1. Preprocessing1

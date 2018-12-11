@@ -16,6 +16,8 @@ from sklearn.neural_network import MLPClassifier  # To train a MLP
 from sklearn.metrics import confusion_matrix      # To evaluate the fitted model
 from sklearn import __version__                   # To keep track of current SkLearn version for unloading model
 
+from skimage.transform import resize  # To resize images to feature size
+
 from joblib import dump, load  # To store the model
 
 class DigitValueDetector:
@@ -26,6 +28,9 @@ class DigitValueDetector:
     TRAINSETS_DIR = HOME + "/trainsets/"
     MODELS_DIR = HOME + "/models/BlackAndRed/"
     TRAIN_TEST_SETS_FILENAME = TRAINSETS_DIR + "/BlackAndRed/splitted/train+testWhole.RData"
+
+    TRAIN_WIDTH  = 10
+    TRAIN_HEIGHT = 42
 
     def die(self):
         print("Trainer destroyed")
@@ -79,7 +84,9 @@ class DigitValueDetector:
         self.classifier = load(filename) 
 
     def imageToFeatures(self, image):
-        return(image.flatten) # TODO flatten matrix
+        resized = resize(image, (DigitValueDetector.TRAIN_HEIGHT, DigitValueDetector.TRAIN_WIDTH));
+        bandw = resized[:,:,0]
+        return(bandw.flatten())
 
 def main():
     solver = 'lbfgs'
