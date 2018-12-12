@@ -7,29 +7,32 @@ Class encapsulating Digits
 import matplotlib.pyplot as plt
 
 
-class DigitModel:   
+class DigitModel:
     RIGHT  = "RIGHT"
     LEFT   = "LEFT"
     TOP    = "TOP"
     BOTTOM = "BOTTOM"
-    
+
     """Models a single digit with its position in the larger image and its subImage"""
-    
+
     def die(self):
         print("DigitModel destroyed")
-    
+
     def __init__(self, originalImageShape, subImage, minRow, minCol, maxRow, maxCol):
         """Initialize the position of the digit and its subImage"""
         self.subImage = subImage
-        self.position = { 'tl':(minCol, minRow), 'br':(maxCol, maxRow) }
-        self.fuzzyPosition = self.computeFuzzyPosition(originalImageShape[0], originalImageShape[1], minRow, minCol, maxRow, maxCol)
+        self.bbox = { 'tl':(minCol, minRow), 'br':(maxCol, maxRow) }
+        self.center = (minCol+(maxCol-minCol)/2, minRow+(maxRow-minRow)/2)
+        self.fuzzyPosition = self.computeFuzzyPosition(originalImageShape, self.center)
         self.guessedValue = None
-        
-    def computeFuzzyPosition(self, originalImageWidth, originalImageHeight, minRow, minCol, maxRow, maxCol):
+
+    def computeFuzzyPosition(self, originalImageShape, center):
         """Position relative to the big picture : (Top/Bottom, Left/Right)"""
         fPos = "NO FUZZY POSITION"
-        xCenter = maxCol-minCol
-        yCenter = maxRow-minRow
+        originalImageWidth  = originalImageShape[1]
+        originalImageHeight = originalImageShape[0]
+        xCenter = center[0]
+        yCenter = center[1]
         if yCenter > originalImageHeight/2:
             fPos = DigitModel.BOTTOM
         else:
@@ -40,7 +43,7 @@ class DigitModel:
         else:
             fPos += " " + DigitModel.LEFT
         return fPos
-        
+
     def display(self):
         plt.imshow(self.subImage)
         plt.show()
