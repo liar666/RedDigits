@@ -1,0 +1,12 @@
+#+STARTUP: showall indent
+
+* Afficher le chiffre détecté dans l'image originale à côté de la BBox
+
+* Jouer avec les paramètres du ScikitLearn::MLPClassifier
+** activation: logistic, tanh, /relu/
+** solver: /lbfgs/, sgd, *adam*
+** momentum: /.9/
+** learning_rate: /constant/, invscaling, *adaptive* + learning_rate_init: /.001/
+** hidden_layer_sizes: (100, 50)...
+** alpha (regularization-overfitting): /0.0001/
+** early_stopping *True* + validation_fraction: /.1/
