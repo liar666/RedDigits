@@ -10,3 +10,8 @@
 ** hidden_layer_sizes: (100, 50)...
 ** alpha (regularization-overfitting): /0.0001/
 ** early_stopping *True* + validation_fraction: /.1/
+
+* Keras
+
+* HDF5
+** store models in this format too
