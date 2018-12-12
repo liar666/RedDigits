@@ -4,6 +4,8 @@
 The module that has utilities to detect the positions of the digits
 """
 
+import sys   # To get commanline arguments
+
 import numpy as np
 
 from skimage import feature, filters  # data, io,
@@ -74,24 +76,28 @@ if __name__ == "__main__":
     #image1 = CLEANED_DIR + "1.png"
     #image3 = CLEANED_DIR + "3.png"
     #image7 = CLEANED_DIR + "7.png"
-    imageComplete3 = DigitPositionDetector.DETECT_DIR + "/example_3.png"
+    #imageComplete = DigitPositionDetector.DETECT_DIR + "/example_3.png"
+    if len(sys.argv) != 2:
+        print("USAGE: "+sys.argv[0]+" <image file where to look for digits>")
+    else:
+        imageComplete = DigitPositionDetector.DETECT_DIR + "/example_3.png"
 
-    positionDetector = DigitPositionDetector(imageComplete3)
-    print("Loaded image ("+imageComplete3+")")
-    positionDetector.displayImage()
-    print("Detecting digits positions...")
-    positionDetector.detect()
-    positionDetector.displayDetectedPositions()
+        positionDetector = DigitPositionDetector(imageComplete)
+        print("Loaded image ("+imageComplete+")")
+        positionDetector.displayImage()
+        print("Detecting digits positions...")
+        positionDetector.detect()
+        positionDetector.displayDetectedPositions()
 
-    print("Original image:")
-    plt.imshow(positionDetector._imageOriginal)
-    plt.show()
-
-    print("Digit positions detected:")
-    positionDetector.displayDetectedPositions()
-    plt.show()
-    
-    print("Extracted digit subImage:")
-    for digit in positionDetector.getDetectedDigits():
-        plt.imshow(digit.subImage)
+        print("Original image:")
+        plt.imshow(positionDetector._imageOriginal)
         plt.show()
+
+        print("Digit positions detected:")
+        positionDetector.displayDetectedPositions()
+        plt.show()
+    
+        print("Extracted digit subImage:")
+        for digit in positionDetector.getDetectedDigits():
+            plt.imshow(digit.subImage)
+            plt.show()
