@@ -12,9 +12,9 @@ import pandas as pd
 from rpy2.robjects import pandas2ri         # To get data from R(Data files)
 from rpy2.robjects.packages import importr
 
-from sklearn.neural_network import MLPClassifier  # To train a MLP
-from sklearn.metrics import confusion_matrix      # To evaluate the fitted model
-from sklearn import __version__                   # To keep track of current SkLearn version for unloading model
+from sklearn.neural_network import MLPClassifier         # To train a MLP
+from sklearn.metrics import confusion_matrix, f1_score   # To evaluate the fitted model
+from sklearn import __version__                          # To keep track of current SkLearn version for unloading model
 
 from skimage.transform import resize  # To resize images to feature size
 
@@ -64,18 +64,25 @@ class DigitValueDetector:
         self.classifier.fit(self.getDataPart(trainSet), self.getClassesPart(trainSet))
 
     def testSingleInstance(self, instanceData):
-        return(self.classifier.predict(instanceData.values.reshape(1,-1)))
+        rawOutput = self.classifier.predict_proba(instanceData.values.reshape(1,-1))
+        dfOutput = pd.DataFrame(rawOutput, columns=self.classColumns)
+        return(dfOutput)
 
     def testMultipleInstances(self, testSetData):
-        return(pd.DataFrame(self.classifier.predict(testSetData), columns=self.classColumns))
+        rawOutput = self.classifier.predict_proba(testSetData)
+        dfOutput = pd.DataFrame(rawOutput, columns=self.classColumns)
+        return(dfOutput)
         
     def convertProbas2Class(self, setClasses):
         return(setClasses.values.argmax(axis=1))
         
     def evaluate(self, testSet):
-        preds = self.convertProbas2Class(self.testMultipleInstances(self.getDataPart(testSet)))
         groundTruth = self.convertProbas2Class(self.getClassesPart(testSet))
-        return(confusion_matrix(groundTruth, preds))
+        preds = self.convertProbas2Class(self.testMultipleInstances(self.getDataPart(testSet)))
+        confMatrix = confusion_matrix(groundTruth, preds)
+        f1Score = f1_score(groundTruth, preds, average='weighted')
+        mlpScore = self.classifier.score(self.getDataPart(testSet), self.getClassesPart(testSet))
+        return({ "ConfusionMatrix": confMatrix, "F1Score": f1Score, "MLPScore": mlpScore })
 
     def saveModel(self, filename):
         dump(self.classifier, filename) 
@@ -84,35 +91,50 @@ class DigitValueDetector:
         self.classifier = load(filename) 
 
     def imageToFeatures(self, image):
-        resized = resize(image, (DigitValueDetector.TRAIN_HEIGHT, DigitValueDetector.TRAIN_WIDTH));
+        resized = resize(image, (DigitValueDetector.TRAIN_HEIGHT, DigitValueDetector.TRAIN_WIDTH), mode='constant', anti_aliasing=True);
         bandw = resized[:,:,0]
         return(bandw.flatten())
 
-def main():
-    solver = 'lbfgs'
-    hidden = (100, 50)
-
-    t = DigitValueDetector()
-
-    modelFilename = t.MODELS_DIR + "/sklearn_" + __version__ + "_mlp_" + solver + "_" + str(hidden) + ".joblib"
-
-    ## Load the data
-    t.loadDataSet(t.TRAIN_TEST_SETS_FILENAME)
-    
-    ## Get/Train+Save Model
-    if os.path.isfile(modelFilename):
-        t.loadModel(modelFilename)
-    else:
-        t.buildClassifier(solver, hidden)
-        t.trainClassifier(t.trainSet)
-        t.saveModel(modelFilename)
-
-    ## Test / Evaluate model
-    t.testSingleInstance(t.testSet.loc[1,t.dataColumns])
-    t.testMultipleInstances(t.getDataPart(t.testSet))
-    confMatrice = t.evaluate(t.testSet)
-    print(confMatrice)
 
 
 if __name__== "__main__":
-       main()
+    solver = 'lbfgs'
+    hidden = (100, 50)
+
+    valueDetector = DigitValueDetector()
+
+    modelFilename = valueDetector.MODELS_DIR + "/sklearn_" + __version__ + "_mlp_" + solver + "_" + str(hidden) + ".joblib"
+
+    ## Load the data
+    valueDetector.loadDataSet(valueDetector.TRAIN_TEST_SETS_FILENAME)
+    print(">>> Data Set loaded")
+    
+    ## Get/Train+Save Model
+    if os.path.isfile(modelFilename):
+        valueDetector.loadModel(modelFilename)
+        print(">>> Model (re)loaded from file ("+modelFilename+")")
+    else:
+        valueDetector.buildClassifier(solver, hidden)
+        print(">>> Training model...")
+        valueDetector.trainClassifier(valueDetector.trainSet)
+        valueDetector.saveModel(modelFilename)
+        print(">>> Model trained and saved")
+
+    ## Test / Evaluate model
+    print(">>> Testing single instance")
+    siRes = valueDetector.testSingleInstance(valueDetector.testSet.loc[1,valueDetector.dataColumns])
+    print(siRes)
+    print(">>> Testing whole testSet")
+    miRes = valueDetector.testMultipleInstances(valueDetector.getDataPart(valueDetector.testSet))
+    print(miRes)
+    print(">>> Evaluating model")
+    print("*** TRAINSET EVALUATION ***")
+    evalsTrain = valueDetector.evaluate(valueDetector.trainSet)
+    print(evalsTrain['ConfusionMatrix'])
+    print("train-set F1-score : " + evalsTrain['F1Score'])
+    print("train-set MLP-score : " + evalsTrain['MLPScore'])
+    print("*** TESTSET EVALUATION ***")
+    evalsTest = valueDetector.evaluate(valueDetector.testSet)
+    print(evalsTest['ConfusionMatrix'])
+    print("test-set F1-score : " + evalsTest['F1Score'])
+    print("test-set MLP-score : " + evalsTest['MLPScore'])
