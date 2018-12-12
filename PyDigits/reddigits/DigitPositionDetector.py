@@ -57,10 +57,10 @@ class DigitPositionDetector:
         fig, ax = plt.subplots(1)
         plt.imshow(self._imageOriginal)
         for digit in self._detectedDigits:
-            minx = digit.position["tl"][0]
-            maxx = digit.position["br"][0]
-            miny = digit.position["tl"][1]
-            maxy = digit.position["br"][1]
+            minx = digit.bbox["tl"][0]
+            maxx = digit.bbox["br"][0]
+            miny = digit.bbox["tl"][1]
+            maxy = digit.bbox["br"][1]
             rect = mpatches.Rectangle((minx, miny), maxx-minx, maxy-miny,
                                       fill=False, edgecolor='blue', linewidth=2)
             ax.add_patch(rect)
@@ -69,27 +69,29 @@ class DigitPositionDetector:
     def getDetectedDigits(self):
         return(self._detectedDigits)
 
-def main():
+
+if __name__ == "__main__":
     #image1 = CLEANED_DIR + "1.png"
     #image3 = CLEANED_DIR + "3.png"
     #image7 = CLEANED_DIR + "7.png"
     imageComplete3 = DigitPositionDetector.DETECT_DIR + "/example_3.png"
 
-    detector1 = DigitPositionDetector(imageComplete3)
-    detector1.displayImage()
-    detector1.detect()
-    detector1.displayDetectedPositions()
+    positionDetector = DigitPositionDetector(imageComplete3)
+    print("Loaded image ("+imageComplete3+")")
+    positionDetector.displayImage()
+    print("Detecting digits positions...")
+    positionDetector.detect()
+    positionDetector.displayDetectedPositions()
 
-    plt.imshow(detector1._imageOriginal)
+    print("Original image:")
+    plt.imshow(positionDetector._imageOriginal)
     plt.show()
 
-    detector1.displayDetectedPositions()
+    print("Digit positions detected:")
+    positionDetector.displayDetectedPositions()
     plt.show()
     
-    for digit in detector1.getDetectedDigits():
+    print("Extracted digit subImage:")
+    for digit in positionDetector.getDetectedDigits():
         plt.imshow(digit.subImage)
         plt.show()
-
-
-if __name__ == "__main__":
-    main()
