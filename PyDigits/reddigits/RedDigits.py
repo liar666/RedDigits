@@ -7,15 +7,16 @@ First attempt at building a induction cooking plate's digits detector in python
 
 import sys    # To get commanline arguments
 
-import pandas as pd
+import pandas as pd # For DataFrames
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 #from sklearn import __version__                   # To keep track of current SkLearn version for unloading model
 
 #import DigitModel as dimo
 import DigitPositionDetector as dipo
 import DigitValueDetector as dival
+import PreProcessor
 
 
 if __name__ == "__main__":
@@ -38,7 +39,7 @@ if __name__ == "__main__":
         valDect.loadModel(modelFilename);
 
         for digit in digits:
-            digitAsFeatures = pd.DataFrame(valDect.imageToFeatures(digit.subImage))
+            digitAsFeatures = pd.DataFrame(PreProcessor.imageToFeatures(digit.subImage))
             digit.guessedValue = valDect.convertProbas2Class(valDect.testSingleInstance(digitAsFeatures))
             digit.display()
             print("Seen a "+ str(digit.guessedValue) + " at " + digit.fuzzyPosition + " " + str(digit.center))
