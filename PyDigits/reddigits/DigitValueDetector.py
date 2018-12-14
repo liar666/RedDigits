@@ -16,9 +16,8 @@ from sklearn.neural_network import MLPClassifier         # To train a MLP
 from sklearn.metrics import confusion_matrix, f1_score   # To evaluate the fitted model
 from sklearn import __version__                          # To keep track of current SkLearn version for unloading model
 
-from skimage.transform import resize  # To resize images to feature size
-
 from joblib import dump, load  # To store the model
+
 
 class DigitValueDetector:
     
@@ -28,9 +27,6 @@ class DigitValueDetector:
     TRAINSETS_DIR = HOME + "/trainsets/"
     MODELS_DIR = HOME + "/models/BlackAndRed/"
     TRAIN_TEST_SETS_FILENAME = TRAINSETS_DIR + "/BlackAndRed/splitted/train+testWhole.RData"
-
-    TRAIN_WIDTH  = 10
-    TRAIN_HEIGHT = 42
 
     def die(self):
         print("Trainer destroyed")
@@ -72,13 +68,14 @@ class DigitValueDetector:
         rawOutput = self.classifier.predict_proba(testSetData)
         dfOutput = pd.DataFrame(rawOutput, columns=self.classColumns)
         return(dfOutput)
-        
-    def convertProbas2Class(self, setClasses):
+
+    @staticmethod
+    def convertProbas2Class(setClasses):
         return(setClasses.values.argmax(axis=1))
         
     def evaluate(self, testSet):
-        groundTruth = self.convertProbas2Class(self.getClassesPart(testSet))
-        preds = self.convertProbas2Class(self.testMultipleInstances(self.getDataPart(testSet)))
+        groundTruth = DigitValueDetector.convertProbas2Class(self.getClassesPart(testSet))
+        preds = DigitValueDetector.convertProbas2Class(self.testMultipleInstances(self.getDataPart(testSet)))
         confMatrix = confusion_matrix(groundTruth, preds)
         f1Score = f1_score(groundTruth, preds, average='weighted')
         mlpScore = self.classifier.score(self.getDataPart(testSet), self.getClassesPart(testSet))
@@ -89,11 +86,6 @@ class DigitValueDetector:
 
     def loadModel(self, filename):
         self.classifier = load(filename) 
-
-    def imageToFeatures(self, image):
-        resized = resize(image, (DigitValueDetector.TRAIN_HEIGHT, DigitValueDetector.TRAIN_WIDTH), mode='constant', anti_aliasing=True);
-        bandw = resized[:,:,0]
-        return(bandw.flatten())
 
 
 
@@ -131,10 +123,10 @@ if __name__== "__main__":
     print("*** TRAINSET EVALUATION ***")
     evalsTrain = valueDetector.evaluate(valueDetector.trainSet)
     print(evalsTrain['ConfusionMatrix'])
-    print("train-set F1-score : " + evalsTrain['F1Score'])
-    print("train-set MLP-score : " + evalsTrain['MLPScore'])
+    print("train-set F1-score : " + str(evalsTrain['F1Score']))
+    print("train-set MLP-score : " + str(evalsTrain['MLPScore']))
     print("*** TESTSET EVALUATION ***")
     evalsTest = valueDetector.evaluate(valueDetector.testSet)
     print(evalsTest['ConfusionMatrix'])
-    print("test-set F1-score : " + evalsTest['F1Score'])
-    print("test-set MLP-score : " + evalsTest['MLPScore'])
+    print("test-set F1-score : " + str(evalsTest['F1Score']))
+    print("test-set MLP-score : " + str(evalsTest['MLPScore']))

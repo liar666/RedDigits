@@ -6,6 +6,13 @@ Class encapsulating Digits
 
 import matplotlib.pyplot as plt
 
+import numpy as np    # ªor arrays
+
+from PIL import Image      # To tag the images
+from PIL import ImageDraw 
+
+import matplotlib.image as mpimg   # ªor loading images from files
+
 
 class DigitModel:
     RIGHT  = "RIGHT"
@@ -23,10 +30,19 @@ class DigitModel:
         self.subImage = subImage
         self.bbox = { 'tl':(minCol, minRow), 'br':(maxCol, maxRow) }
         self.center = (minCol+(maxCol-minCol)/2, minRow+(maxRow-minRow)/2)
-        self.fuzzyPosition = self.computeFuzzyPosition(originalImageShape, self.center)
+        self.fuzzyPosition = DigitModel.computeFuzzyPosition(originalImageShape, self.center)
         self.guessedValue = None
 
-    def computeFuzzyPosition(self, originalImageShape, center):
+    @staticmethod
+    def tagImage(imgNP, tag):
+        imgNP = np.uint8(imgNP*255)
+        imgPIL = Image.fromarray(imgNP)
+        draw = ImageDraw.Draw(imgPIL)
+        draw.text( (imgPIL.size[0]/2, 0), tag, (255,255,255) )
+        return(np.array(imgPIL))
+
+    @staticmethod
+    def computeFuzzyPosition(originalImageShape, center):
         """Position relative to the big picture : (Top/Bottom, Left/Right)"""
         fPos = "NO FUZZY POSITION"
         originalImageWidth  = originalImageShape[1]
@@ -44,6 +60,22 @@ class DigitModel:
             fPos += " " + DigitModel.LEFT
         return fPos
 
+    def getTaggedImage(self):
+        img = self.subImage
+        if self.guessedValue != None:
+            img = DigitModel.tagImage(img, str(self.guessedValue))
+        return(img)
+
     def display(self):
-        plt.imshow(self.subImage)
+        plt.imshow(self.getTaggedImage())
         plt.show()
+
+
+if __name__ == "__main__":
+    HOME = "/home/guigui/GMCodes/RedDigits/"
+    DIGIT_IMAGE_DIR = HOME + "/images/numbers_cleaned/"
+    img = mpimg.imread(DIGIT_IMAGE_DIR + "0.png")
+    digit = DigitModel((200,200), img, 10, 20 , 10+img.shape[1], 20+img.shape[0])
+    digit.guessedValue = 0
+    digit.display()
+    plt.show()
