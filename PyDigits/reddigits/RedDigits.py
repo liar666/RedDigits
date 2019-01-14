@@ -3,6 +3,7 @@
 
 """
 First attempt at building a induction cooking plate's digits detector in python
+3. Entry Point for Digit Position+Value Detection phase
 """
 
 import sys    # To get commanline arguments
@@ -10,28 +11,27 @@ import sys    # To get commanline arguments
 import pandas as pd # For DataFrames
 
 #import matplotlib.pyplot as plt
-
 #from sklearn import __version__                   # To keep track of current SkLearn version for unloading model
 
-#import DigitModel as dimo
-import DigitPositionDetector as dipo
-import DigitValueDetector as dival
-import PreProcessor
-
+from DigitPositionDetector import DigitPositionDetector
+from DigitValueDetector import DigitValueDetector
+from PreProcessor import PreProcessor
+from Utils import Utils
 
 if __name__ == "__main__":
     if (len(sys.argv)!=3):
         print("USAGE: " + sys.argv[0] + " <image file> <model file>")
         sys.exit(1)
     else:
-        #imageComplete = dipo.DigitPositionDetector.DETECT_DIR + "/example_3.png"
-        imageComplete = sys.argv[1]
-        posDect = dipo.DigitPositionDetector(imageComplete)
+        #imageComplete = DigitPositionDetector.DigitPositionDetector.DETECT_DIR + "/example_3.png"
+        imageCompleteFile = sys.argv[1]
+        imageComplete = Utils.readImage(imageCompleteFile)
+        posDect = DigitPositionDetector(imageComplete)
         posDect.detect()
         posDect.displayImage()
         digits = posDect.getDetectedDigits()
 
-        valDect = dival.DigitValueDetector()
+        valDect = DigitValueDetector()
         solver = 'lbfgs'
         hidden = (10, 5)
         #modelFilename = valDect.MODELS_DIR + "/sklearn_" + __version__ + "_mlp_" + solver + "_" + str(hidden) + ".joblib" # TODO argv[2]
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             digitAsFeatures = pd.DataFrame(PreProcessor.imageToFeatures(digit.subImage))
             digit.guessedValue = valDect.convertProbas2Class(valDect.testSingleInstance(digitAsFeatures))
             digit.display()
-            print("Seen a "+ str(digit.guessedValue) + " at " + digit.fuzzyPosition + " " + str(digit.center))
+            print("Seen a "+ str(valDect.convertValue2ClassName(digit.guessedValue)) + " at " + digit.fuzzyPosition + " " + str(digit.center))
 
 
 

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Trains a DeepNN to recognize digits
+2. Entry Point for Training phase
 """
 
 import os.path       # Check if (model) file already exists
@@ -37,7 +38,7 @@ class DigitValueDetector:
         self.dataColumns  = None  # ("i1", ...., "i420")
         self.classColumns = None  # ("c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "cE", "cH", "cOTHER")
         self.classifier = None
-        
+
     def loadDataSet(self, rDataFilename):
         pandas2ri.activate()
         base = importr('base')
@@ -52,7 +53,7 @@ class DigitValueDetector:
 
     def getClassesPart(self, dataSet):
         return(dataSet.loc[:, self.classColumns])
-        
+
     def buildClassifier(self, solvr, hidden):
         self.classifier = MLPClassifier(solver=solvr, alpha = 1e-5, hidden_layer_sizes = hidden, random_state = 1)
 
@@ -69,13 +70,20 @@ class DigitValueDetector:
         dfOutput = pd.DataFrame(rawOutput, columns=self.classColumns)
         return(dfOutput)
 
+    def convertValue2ClassName(self, value):
+        return self.classColumns[value]
+
     @staticmethod
-    def convertProbas2Class(setClasses):
+    def convertProbas2ClassID(setClasses):
         return(setClasses.values.argmax(axis=1))
-        
+
+# TODO: FINISH: manage case where input is 2D array?
+#    def convertProbas2ClassName(self, setClasses):
+#        return(self.convertValue2ClassName(setClasses.values.argmax(axis=1)))
+
     def evaluate(self, testSet):
-        groundTruth = DigitValueDetector.convertProbas2Class(self.getClassesPart(testSet))
-        preds = DigitValueDetector.convertProbas2Class(self.testMultipleInstances(self.getDataPart(testSet)))
+        groundTruth = DigitValueDetector.convertProbas2ClassID(self.getClassesPart(testSet))
+        preds = DigitValueDetector.convertProbas2ClassID(self.testMultipleInstances(self.getDataPart(testSet)))
         confMatrix = confusion_matrix(groundTruth, preds)
         f1Score = f1_score(groundTruth, preds, average='weighted')
         mlpScore = self.classifier.score(self.getDataPart(testSet), self.getClassesPart(testSet))

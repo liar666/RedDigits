@@ -4,15 +4,14 @@
 Class encapsulating Digits
 """
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt    # for displaying images
 
 import numpy as np    # ªor arrays
 
 from PIL import Image      # To tag the images
 from PIL import ImageDraw 
 
-import matplotlib.image as mpimg   # ªor loading images from files
-
+from Utils import Utils
 
 class DigitModel:
     RIGHT  = "RIGHT"
@@ -34,11 +33,11 @@ class DigitModel:
         self.guessedValue = None
 
     @staticmethod
-    def tagImage(imgNP, tag):
+    def tagImage(imgNP, tag, position, color=(255,255,255)):
         imgNP = np.uint8(imgNP*255)
         imgPIL = Image.fromarray(imgNP)
         draw = ImageDraw.Draw(imgPIL)
-        draw.text( (imgPIL.size[0]/2, 0), tag, (255,255,255) )
+        draw.text(position, tag, color)
         return(np.array(imgPIL))
 
     @staticmethod
@@ -63,7 +62,7 @@ class DigitModel:
     def getTaggedImage(self):
         img = self.subImage
         if self.guessedValue != None:
-            img = DigitModel.tagImage(img, str(self.guessedValue))
+            img = DigitModel.tagImage(img, str(self.guessedValue), (self.subImage.shape[1]/2, 0))
         return(img)
 
     def display(self):
@@ -74,7 +73,7 @@ class DigitModel:
 if __name__ == "__main__":
     HOME = "/home/guigui/GMCodes/RedDigits/"
     DIGIT_IMAGE_DIR = HOME + "/images/numbers_cleaned/"
-    img = mpimg.imread(DIGIT_IMAGE_DIR + "0.png")
+    img = Utils.readImage(DIGIT_IMAGE_DIR + "0.png")
     digit = DigitModel((200,200), img, 10, 20 , 10+img.shape[1], 20+img.shape[0])
     digit.guessedValue = 0
     digit.display()
