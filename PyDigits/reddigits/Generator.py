@@ -106,13 +106,13 @@ class Generator:
                                         resized  =- warp(blured, zoomTform, output_shape=img.shape, mode='edge')
                                         print("resized="+str(np.mean(resized)))
                                         resized = -1*resized ## TODO: why does resize invert all the values?
-                                        #Utils.showImage(resized);
                                         
                                         # Save the new image
                                         newFile = Generator.DIGITS_OUTDIR + "/" + str(number) + \
                                          "_t" + str(tilt)  + "_r" + str(angle) + "_t" + str(xtransl) + "_" + str(ytransl) + \
                                          "_b" + str(sigma) + "_s" + str(ratio) + ".png"
                                         print("Writing image file: " + newFile)
+                                        #Utils.showImage(resized);
                                         Utils.writeImage(resized, newFile)
 
                                         print("Treating file: " + newFile)

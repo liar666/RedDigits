@@ -28,6 +28,7 @@ class DigitPositionDetector:
     IMAGE_DIR   = BASE_DIR + "/images/"
     CLEANED_DIR = IMAGE_DIR + "/numbers_cleaned/"
     DETECT_DIR  = IMAGE_DIR + "/detectPosition/"
+    FUSION_BLUR = 1.04
 
     def die(self):
         print("DigitDetector destroyed")
@@ -36,14 +37,18 @@ class DigitPositionDetector:
         """Initializes the detector by loading the image (where to look for digits)"""
         self._imageOriginal = image
         self._imageProcessed = None
+        self.toBaW()
         self._detectedDigits = []
 
+    def toBaW(self):
+        self._imageProcessed = np.mean(self._imageOriginal, -1)           # trick to rgb2grey
+        self._imageProcessed = filters.gaussian(self._imageProcessed, 
+                                                sigma=DigitPositionDetector.FUSION_BLUR) # trying to merge parts of the digits by bluring
+        mean = np.mean(self._imageProcessed)                              # making image strict B&W
+        self._imageProcessed[self._imageProcessed >  mean] = 255
+        self._imageProcessed[self._imageProcessed <= mean] = 0
+
     def detect(self):
-        self._imageProcessed = np.mean(self._imageOriginal, -1)                   # trick to rgb2grey
-        self._imageProcessed = filters.gaussian(self._imageProcessed, sigma=1.04) # trying to merge parts of the digits by bluring
-        mean = np.mean(self._imageProcessed)                                     # making image strict B&W
-        self._imageProcessed[self._imageProcessed-mean >  1e-15] = 1
-        self._imageProcessed[self._imageProcessed-mean <= 1e-15] = 0
         edges = feature.canny(self._imageProcessed, sigma=1, low_threshold=None, high_threshold=None)
         labels = label(edges)
         for region in regionprops(labels):

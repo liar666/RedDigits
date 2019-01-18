@@ -32,6 +32,13 @@ class DigitModel:
         self.fuzzyPosition = DigitModel.computeFuzzyPosition(originalImageShape, self.center)
         self.guessedValue = None
 
+    def __str__(self):
+        self.display()
+        print("bbox = (" + str(self.bbox.tl) + ") -> (" + str(self.bbox.br) + ")")
+        print("center = (" + str(self.center) + ")")
+        print("fuzzyPos=" + self.fuzzyPosition)
+        print("value=" + self.guessedValue)
+
     @staticmethod
     def tagImage(imgNP, tag, position, color=(255,255,255)):
         imgNP = np.uint8(imgNP*255)
